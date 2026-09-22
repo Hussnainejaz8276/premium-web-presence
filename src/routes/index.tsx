@@ -14,7 +14,7 @@ import {
   Settings,
   ShieldCheck,
 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -141,7 +141,7 @@ function Index() {
               <div className="flex h-48 items-end gap-1.5 border-b border-border/70 px-1">
                 {volume.map((height, index) => (
                   <div key={`${height}-${index}`} className="group flex h-full flex-1 items-end">
-                    <div className="data-bar w-full rounded-t-[2px] bg-primary transition-all duration-500 group-hover:brightness-125" style={{ "--bar-height": `${height}%`, opacity: 0.24 + index * 0.045 } as React.CSSProperties} />
+                    <div className="data-bar w-full rounded-t-[2px] bg-primary transition-all duration-500 group-hover:brightness-125" style={{ "--bar-height": `${height}%`, opacity: 0.24 + index * 0.045 } as CSSProperties} />
                   </div>
                 ))}
               </div>
