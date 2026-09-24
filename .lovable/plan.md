@@ -1,7 +1,7 @@
 # Restore CleanRoom workflows in the new interface
 
 ## Goal
-Keep the selected obsidian/orange dashboard aesthetic, but replace its placeholder metrics and signup-only experience with the real tools from the previous frontend. The Pandas sandbox remains excluded.
+Create a drop-in replacement for the existing `https://cleanroom-datacleaner.com/app` frontend. Keep the selected obsidian/orange aesthetic while preserving the old frontend’s complete service contract. The Pandas sandbox remains excluded.
 
 ## What will be restored
 - Dataset upload by browse or drag-and-drop for CSV, TSV, Excel, JSON, Parquet, and ZIP files.
@@ -18,6 +18,11 @@ Keep the selected obsidian/orange dashboard aesthetic, but replace its placehold
 - Organize the real workflow into focused Overview, Prepare, Results, Vision, and Assistant areas instead of restoring the old long marketing page.
 - Use expandable advanced controls to keep the workspace usable without hiding functionality.
 - Keep all compatibility IDs and field names required by the existing CleanRoom service.
+
+## Drop-in compatibility
+- Keep `/app` as the application location and use same-origin relative `/api/...` requests, matching the current deployment.
+- Preserve every backend request shape, form field name, DOM compatibility hook, authentication token, download URL, and payment flow used by the uploaded frontend.
+- Make no backend, database, or API changes; deployment is a frontend replacement only.
 
 ## Technical details
 - Reuse the uploaded service contracts and result rendering behavior rather than inventing replacement endpoints.
