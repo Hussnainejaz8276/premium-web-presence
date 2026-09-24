@@ -2252,47 +2252,8 @@ a#download-link {
 
 
   
-  // --- Pandas sandbox + Gemini chart history (fixed live update) ---
-  function ensurePandasGeminiPanels() { return; /* Pandas sandbox intentionally excluded. */
-    if (document.getElementById('pandas-gemini-tools')) return;
-    var host = document.getElementById('results') || document.querySelector('.cr-main') || document.body;
-    var sec = document.createElement('section');
-    sec.id = 'pandas-gemini-tools';
-    sec.style.cssText = 'margin:1rem 0;padding:0 0.5rem;';
-    sec.innerHTML =
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.85rem" class="pandas-gemini-grid">' +
-      '<div class="glass-panel" style="padding:1rem">' +
-      '<div style="font-family:monospace;font-size:0.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent,#f06a1d);margin-bottom:0.35rem">Pandas sandbox</div>' +
-      '<p style="font-size:0.78rem;color:var(--ink-3,#a1a1aa);margin-bottom:0.55rem">Edit live cleaned dataset with <code style="color:var(--accent)">df</code>. Preview &amp; download update after Run.</p>' +
-      '<textarea id="cr-pandas-code" rows="8" spellcheck="false" style="width:100%;font-family:ui-monospace,monospace;font-size:0.78rem;background:var(--surface-2,#111);color:var(--ink,#eee);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:10px;padding:0.65rem;resize:vertical"></textarea>' +
-      '<div style="display:flex;gap:0.5rem;margin-top:0.55rem;align-items:center;flex-wrap:wrap">' +
-      '<button type="button" id="cr-pandas-run" style="border:none;border-radius:10px;padding:0.5rem 1rem;cursor:pointer;background:linear-gradient(135deg,#f06a1d,#ff8a3d);color:#1a0d04;font-weight:700;font-size:0.82rem">Run pandas →</button>' +
-      '<span id="cr-pandas-log" style="font-size:0.72rem;color:var(--ink-3,#a1a1aa)"></span>' +
-      '</div></div>' +
-      '<div class="glass-panel" id="gemini-charts-panel" style="padding:1rem">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.35rem">' +
-      '<div style="font-family:monospace;font-size:0.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent,#f06a1d)">Gemini charts history</div>' +
-      '<button type="button" id="cr-gemini-charts-clear" style="font-size:0.7rem;background:transparent;border:1px solid var(--border,rgba(255,255,255,.12));color:var(--ink-3);border-radius:8px;padding:0.25rem 0.55rem;cursor:pointer">Clear</button>' +
-      '</div>' +
-      '<p style="font-size:0.78rem;color:var(--ink-3,#a1a1aa);margin-bottom:0.55rem">Ask Gemini for pie/bar/line/scatter/hist — every chart is kept here (scrollable).</p>' +
-      '<div id="cr-gemini-charts" style="display:grid;gap:0.75rem;max-height:480px;overflow-y:auto;padding-right:4px"></div>' +
-      '<p id="cr-gemini-charts-empty" style="font-size:0.8rem;color:var(--ink-3);padding:1.5rem 0;text-align:center">No Gemini charts yet. Try: “Show a pie chart of GENDER” or “Bar of SUBSCRIPTION_PLAN vs AGE”.</p>' +
-      '</div></div>';
-    if (host.id === 'results' && host.parentNode) host.parentNode.insertBefore(sec, host);
-    else host.appendChild(sec);
-    var ta = document.getElementById('cr-pandas-code');
-    if (ta && !ta.value) {
-      ta.value = 'df = df.head(100)\n# Example: df["AGE"] = pd.to_numeric(df["AGE"], errors="coerce")\n# df = df.dropna(subset=["AGE"])';
-    }
-    document.getElementById('cr-pandas-run').addEventListener('click', runPandasLive);
-    var clr = document.getElementById('cr-gemini-charts-clear');
-    if (clr) clr.addEventListener('click', function () {
-      var box = document.getElementById('cr-gemini-charts');
-      if (box) box.innerHTML = '';
-      var empty = document.getElementById('cr-gemini-charts-empty');
-      if (empty) empty.style.display = '';
-    });
-  }
+  // The legacy bridge expects this hook. The live code sandbox is intentionally excluded.
+  function ensurePandasGeminiPanels() {}
 
   function updateCleanedPreviewFromRows(rows, cols) {
     function esc(v) {
@@ -2319,65 +2280,6 @@ a#download-link {
       // skip raw table if marked
       var parent = tbl.closest('[id]');
       if (parent && (parent.id === 'raw-content' || (parent.id || '').indexOf('raw') >= 0)) return;
-    });
-  }
-
-  function runPandasLive() {
-    var code = (document.getElementById('cr-pandas-code') || {}).value || '';
-    var log = document.getElementById('cr-pandas-log');
-    var btn = document.getElementById('cr-pandas-run');
-    if (!code.trim()) { if (log) log.textContent = 'Write some code first.'; return; }
-    if (log) log.textContent = 'Running…';
-    if (btn) btn.disabled = true;
-    var rid = null;
-    try { rid = window.__CR_RESULT_ID; } catch (e) {}
-    var tok = '';
-    try { tok = localStorage.getItem('cleanroom_token') || ''; } catch (e) {}
-    fetch('/api/pandas-code', {
-      method: 'POST',
-      credentials: 'include',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { Authorization: 'Bearer ' + tok } : {}),
-      body: JSON.stringify({ code: code, result_id: rid || undefined }),
-    }).then(function (r) {
-      return r.text().then(function (text) {
-        var d = {};
-        try {
-          if (/<!DOCTYPE|<html[\s>]/i.test(text)) throw new Error('html');
-          d = text ? JSON.parse(text) : {};
-        } catch (e) {
-          throw new Error((typeof safeErrorMessage === 'function')
-            ? safeErrorMessage(r.status, text, 'Server error')
-            : ('Request failed (' + r.status + ')'));
-        }
-        if (!r.ok) {
-          var detail = d.detail;
-          if (typeof detail === 'object') detail = JSON.stringify(detail);
-          throw new Error(detail || ('Error ' + r.status));
-        }
-        return d;
-      });
-    }).then(function (d) {
-      if (log) log.textContent = (d.log || 'OK') + ' · ' + (d.rows || 0) + ' rows × ' + (d.columns || 0) + ' cols';
-      if (d.result_id) {
-        try { window.__CR_RESULT_ID = d.result_id; } catch (e) {}
-      }
-      var dl = document.getElementById('download-link');
-      if (dl && d.download_url) {
-        dl.href = d.download_url;
-        dl.textContent = 'Download clean dataset';
-      }
-      updateCleanedPreviewFromRows(d.preview || [], d.column_names || []);
-      // flash results
-      var results = document.getElementById('results');
-      if (results) {
-        results.classList.remove('hidden');
-        results.style.outline = '2px solid var(--accent,#f06a1d)';
-        setTimeout(function () { results.style.outline = ''; }, 1000);
-      }
-    }).catch(function (err) {
-      if (log) log.textContent = err.message || String(err);
-    }).finally(function () {
-      if (btn) btn.disabled = false;
     });
   }
 

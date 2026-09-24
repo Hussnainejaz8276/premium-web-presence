@@ -287,7 +287,7 @@ export default function App() {
       const dl = document.getElementById('download-link') as HTMLAnchorElement | null
       const href = dl?.getAttribute('href') || ''
       const m = href.match(/\/api\/download\/([a-f0-9]+)/i)
-      if (m) setLastResultId(m[1])
+      if (m?.[1]) setLastResultId(m[1])
     }
     pick()
     const t = window.setInterval(pick, 1500)
@@ -1245,8 +1245,6 @@ export default function App() {
           gap: 0.75rem;
         }
         @media (max-width: 900px) {
-          .pandas-gemini-grid { grid-template-columns: 1fr !important; }
-
           .results-analytics-row { grid-template-columns: 1fr !important; }
         }
 
@@ -1762,7 +1760,6 @@ select, input[type="text"], input[type="password"], textarea {
       <header className="cr-topbar">
         <div
           style={{
-            width: '100%',
             width: '100%',
             maxWidth: 'none',
             margin: 0,
