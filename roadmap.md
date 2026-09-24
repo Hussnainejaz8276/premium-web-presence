@@ -8,5 +8,5 @@
 ## Drop-in /app frontend
 - [x] Preserve legacy upload, cleaning, EDA, ML, CV, billing, auth, and Gemini contracts.
 - [x] Remove the Pandas sandbox from both React and compatibility bridge layers.
-- [ ] Verify the replacement workspace on desktop and mobile.
+- [x] Verify the replacement workspace on desktop and mobile.
 

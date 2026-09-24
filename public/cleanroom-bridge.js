@@ -2252,9 +2252,6 @@ a#download-link {
 
 
   
-  // The legacy bridge expects this hook. The live code sandbox is intentionally excluded.
-  function ensurePandasGeminiPanels() {}
-
   function updateCleanedPreviewFromRows(rows, cols) {
     function esc(v) {
       return String(v == null || v === '' ? '—' : v)
@@ -2285,7 +2282,6 @@ a#download-link {
 
   function renderGeminiCharts(charts) {
     if (!charts || !charts.length) return;
-    ensurePandasGeminiPanels();
     var box = document.getElementById('cr-gemini-charts');
     var empty = document.getElementById('cr-gemini-charts-empty');
     if (empty) empty.style.display = 'none';
@@ -2418,7 +2414,5 @@ a#download-link {
     };
   })();
 
-  document.addEventListener('DOMContentLoaded', function () { try { ensurePandasGeminiPanels(); } catch (e) {} });
-  setTimeout(function () { try { ensurePandasGeminiPanels(); } catch (e) {} }, 600);
 
 })();

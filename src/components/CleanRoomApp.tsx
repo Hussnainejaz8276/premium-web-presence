@@ -866,6 +866,15 @@ export default function App() {
         }
         @media (max-width: 720px) {
           .cr-sidebar { display: none; }
+          .cr-topbar { height: 56px; }
+          .cr-topbar > div { padding: 0 0.75rem !important; gap: 0.5rem !important; }
+          .cr-topbar > div > div:first-child { gap: 0 !important; }
+          .cr-topbar > div > div:first-child span { display: none; }
+          .cr-topbar > div > div:last-child { gap: 0.35rem !important; }
+          .cr-topbar #export-report-btn { padding: 0.4rem 0.65rem !important; }
+          .cr-topbar a[href="/pricing"] { display: none; }
+          .cr-topbar [title="Account"] { width: 30px !important; height: 30px !important; }
+          .theme-toggle { padding: 0.35rem 0.55rem; }
         }
         .ba-dashboard { width: 100%; }
 
